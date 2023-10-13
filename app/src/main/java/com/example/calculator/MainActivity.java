@@ -1,5 +1,6 @@
 package com.example.calculator;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -15,8 +16,10 @@ public class MainActivity extends AppCompatActivity {
 
     //Variables
     private Double operand1 = null;
-    private Double operand2 = null;
     private String pendingOperation = "=";
+
+    private static final String STATE_PENDING_OPERATION = "PendingOperation";
+    private static final String STATE_OPERAND1 = "Operand1";
 
 
     @Override
@@ -61,21 +64,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         buttonC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 newNumber.setText("");
                 operand1 = null;
-                operand2 = null;
                 result.setText("");
                 displayOperation.setText("");
                 pendingOperation = "=";
             }
         });
-
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -103,57 +101,67 @@ public class MainActivity extends AppCompatActivity {
                 Button b = (Button) view;
                 String op = b.getText().toString();
                 String value = newNumber.getText().toString();
-                if (value.length() != 0 ) {
+                if (value.length() != 0) {
                     perfromOperation(value, op);
                 }
                 pendingOperation = op;
                 displayOperation.setText(pendingOperation);
             }
         };
-
         buttonEquals.setOnClickListener(opListener);
         buttonPlus.setOnClickListener(opListener);
         buttonMinus.setOnClickListener(opListener);
         buttonDevide.setOnClickListener(opListener);
         buttonMultiply.setOnClickListener(opListener);
-
-
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString(STATE_PENDING_OPERATION, pendingOperation);
+        if (operand1 != null) {
+            outState.putDouble(STATE_OPERAND1, operand1);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION);
+        operand1 = savedInstanceState.getDouble(STATE_OPERAND1);
+        displayOperation.setText(pendingOperation);
+    }
 
     private void perfromOperation(String value, String op) {
         if (value.equals("."))
             value = "0.0";
 
+        Double val = Double.valueOf(value);
         if (operand1 == null) {
-            operand1 = Double.valueOf(value);
-        }
-        else {
-            operand2 = Double.valueOf(value);
-
+            operand1 = val;
+        } else {
             if (pendingOperation.equals("=")) {
                 pendingOperation = op;
             }
             switch (pendingOperation) {
                 case "=":
-                    operand1 = operand2;
+                    operand1 = val;
                     break;
                 case "/":
-                    if (operand2 == 0) {
+                    if (val == 0) {
                         operand1 = 0.0;
                     } else {
-                        operand1 /= operand2;
+                        operand1 /= val;
                     }
                     break;
                 case "*":
-                    operand1 *= operand2;
+                    operand1 *= val;
                     break;
                 case "-":
-                    operand1 -= operand2;
+                    operand1 -= val;
                     break;
                 case "+":
-                    operand1 += operand2;
+                    operand1 += val;
                     break;
             }
         }
