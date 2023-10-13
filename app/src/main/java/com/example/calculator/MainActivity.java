@@ -8,6 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.nio.DoubleBuffer;
 
 public class MainActivity extends AppCompatActivity {
     private EditText result;
@@ -61,6 +65,28 @@ public class MainActivity extends AppCompatActivity {
                 if (result.length() > 0)
                     result = result.substring(0, result.length() - 1);
                 newNumber.setText(result);
+            }
+        });
+
+        buttonMinus.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                try {
+                    Double numberToNegative = Double.valueOf(newNumber.getText().toString());
+                    if (numberToNegative < 0) {
+                        Toast.makeText(MainActivity.this, "Number is already negative", Toast.LENGTH_SHORT).show();
+                    }
+                    if (numberToNegative > 0) {
+                        numberToNegative = numberToNegative * (-1);
+                        newNumber.setText(numberToNegative.toString());
+                    }
+                } catch (Exception error) {
+                    Toast.makeText(MainActivity.this, "Number not entered", Toast.LENGTH_SHORT).show();
+                }
+
+
+
+                return false;
             }
         });
 
