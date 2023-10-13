@@ -123,6 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void perfromOperation(String value, String op) {
+        if (value.equals("."))
+            value = "0.0";
+
         if (operand1 == null) {
             operand1 = Double.valueOf(value);
         }
